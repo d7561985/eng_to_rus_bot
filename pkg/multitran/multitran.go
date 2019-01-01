@@ -23,10 +23,8 @@ type Result struct {
 // String output results.
 // @limit - max trans. limit
 func (r Result) String(limit int) string {
-	buf := bytes.NewBufferString(r.Word)
-	buf.WriteString("[")
-	buf.WriteString(r.Url)
-	buf.WriteString("]\n")
+	buf := bytes.NewBufferString(r.Url)
+	buf.WriteString("\n")
 
 	for _, v := range r.List {
 		buf.WriteString(v.Sub)
