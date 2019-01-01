@@ -1,9 +1,11 @@
 package main
 
 import (
+	"crypto/tls"
 	"github.com/d7561985/eng_to_rus_bot/pkg/multitran"
 	"github.com/go-telegram-bot-api/telegram-bot-api"
 	"github.com/rs/zerolog/log"
+	"net/http"
 	"os"
 )
 
@@ -13,7 +15,7 @@ func main() {
 		log.Panic().Msg("BOT_TOKEN system variable not present")
 	}
 
-	bot, err := tgbotapi.NewBotAPI(token)
+	bot, err := tgbotapi.NewBotAPIWithClient(token, &http.Client{Transport: &http.Transport{TLSClientConfig: getTLS()}})
 	if err != nil {
 		log.Panic().Err(err).Str("token", token).Msg("init bot api")
 	}
@@ -52,4 +54,12 @@ func main() {
 			log.Error().Err(err).Msgf("send message to: %s", update.Message.From.UserName)
 		}
 	}
+}
+
+func getTLS() *tls.Config {
+	certificate, err := tls.LoadX509KeyPair("assets/cert.pem", "assets/key.pem")
+	if err != nil {
+		log.Panic().Err(err).Msg("load cetificates")
+	}
+	return &tls.Config{Certificates: []tls.Certificate{certificate}}
 }
