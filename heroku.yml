@@ -1,4 +1,4 @@
 build:
   docker:
     web: Dockerfile
-run: eng_to_rus_bot
+run: /eng_to_rus_bot
