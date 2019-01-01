@@ -44,3 +44,9 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[metadata.heroku]
+  root-package = "github.com/d7561985/eng_to_rus_bot"
+  go-version = "go1.11"
+  install = [ "."]
+  ensure = "false"
