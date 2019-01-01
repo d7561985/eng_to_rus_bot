@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+	go listener()
 	token, ok := os.LookupEnv("BOT_TOKEN")
 	if !ok {
 		log.Panic().Msg("BOT_TOKEN system variable not present")
@@ -62,4 +63,18 @@ func getTLS() *tls.Config {
 		log.Panic().Err(err).Msg("load cetificates")
 	}
 	return &tls.Config{Certificates: []tls.Certificate{certificate}}
+}
+
+func listener() {
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "3000"
+	}
+
+	http.HandleFunc("/", func(writer http.ResponseWriter, request *http.Request) {
+
+	})
+	if err := http.ListenAndServe(":"+port, http.DefaultServeMux); err != nil {
+		log.Panic().Err(err).Msg("fake listener")
+	}
 }
