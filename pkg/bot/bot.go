@@ -62,6 +62,16 @@ func (b *bot) LiveListener() {
 	}
 }
 
+// require meta data on heroku
+// $ heroku labs:enable runtime-dyno-metadata -a {{.APP_NAME}}
+// after this we can use HEROKU_APP_NAME for get slug domain in https://{{.HEROKU_APP_NAME}}.herokuapp.com/
+// for registering
+func (b *bot) WebHook() {
+	if config.V.HerokuSlug == "" {
+		log.Panic().Msg("HEROKU_APP_NAME not exist. There is no way to check domain name. Try to enable runtime-dyno-metadata")
+	}
+}
+
 func getTLS() *tls.Config {
 	certificate, err := tls.LoadX509KeyPair("assets/cert.pem", "assets/key.pem")
 	if err != nil {

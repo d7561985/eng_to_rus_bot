@@ -11,6 +11,7 @@ func init() {
 	viper.AutomaticEnv()
 	viper.RegisterAlias("BOTTOKEN", "BOT_TOKEN")
 	viper.RegisterAlias("BOTDEBUG", "BOT_DEBUG")
+	viper.RegisterAlias("HEROKUSLUG", "HEROKU_APP_NAME")
 	viper.SetDefault("PORT", "3000")
 
 	if err := read(); err != nil {
