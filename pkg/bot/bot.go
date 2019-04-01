@@ -34,7 +34,55 @@ func (b *bot) LiveListener() {
 	u.Timeout = 60
 
 	updates, err := bot.GetUpdatesChan(u)
+	if err != nil {
+		log.Fatal().Err(err).Msg("get updates")
+	}
 
+	log.Info().Msg("start")
+	update(updates, bot)
+}
+
+// require meta data on heroku
+// $ heroku labs:enable runtime-dyno-metadata -a {{.APP_NAME}}
+// after this we can use HEROKU_APP_NAME for get slug domain in https://{{.HEROKU_APP_NAME}}.herokuapp.com/
+// for registering
+func (b *bot) WebHook() {
+	if config.V.HerokuSlug == "" {
+		log.Panic().Msg("HEROKU_APP_NAME not exist. There is no way to check domain name. Try to enable runtime-dyno-metadata")
+	}
+
+	bot, err := tgbotapi.NewBotAPI(config.V.BotToken)
+	if err != nil {
+		log.Panic().Err(err).Str("token", config.V.BotToken).Msg("init bot api")
+	}
+
+	bot.Debug = config.V.BotDebug
+
+	log.Printf("Authorized on account %s", bot.Self.UserName)
+
+	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://"+config.V.HerokuSlug+".herokuapp.com/"+bot.Token, "assets/cert.pem"))
+	if err != nil {
+		log.Fatal().Err(err).Msg("set hook")
+	}
+
+	info, err := bot.GetWebhookInfo()
+	if err != nil {
+		log.Fatal().Err(err).Msg("get hook info")
+	}
+
+	if info.LastErrorDate != 0 {
+		log.Printf("Telegram callback failed: %s", info.LastErrorMessage)
+	}
+
+	log.Info().Msg("start")
+	updates := bot.ListenForWebhook("/" + bot.Token)
+	go http.ListenAndServeTLS("0.0.0.0:"+config.V.Port, "assets/cert.pem", "assets/key.pem", nil)
+
+	update(updates, bot)
+}
+
+// update controller
+func update(updates tgbotapi.UpdatesChannel, bot *tgbotapi.BotAPI) {
 	for update := range updates {
 		if update.Message == nil { // ignore any non-Message Updates
 			continue
@@ -59,16 +107,6 @@ func (b *bot) LiveListener() {
 		if _, err := bot.Send(msg); err != nil {
 			log.Error().Err(err).Msgf("send message to: %s", update.Message.From.UserName)
 		}
-	}
-}
-
-// require meta data on heroku
-// $ heroku labs:enable runtime-dyno-metadata -a {{.APP_NAME}}
-// after this we can use HEROKU_APP_NAME for get slug domain in https://{{.HEROKU_APP_NAME}}.herokuapp.com/
-// for registering
-func (b *bot) WebHook() {
-	if config.V.HerokuSlug == "" {
-		log.Panic().Msg("HEROKU_APP_NAME not exist. There is no way to check domain name. Try to enable runtime-dyno-metadata")
 	}
 }
 

@@ -8,9 +8,9 @@ import (
 )
 
 func main() {
-	go listener()
+	//go listener()
 
-	bot.B().LiveListener()
+	bot.B().WebHook()
 }
 
 func listener() {
