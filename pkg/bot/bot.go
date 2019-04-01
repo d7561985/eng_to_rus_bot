@@ -77,7 +77,7 @@ func (b *bot) WebHook() {
 
 	log.Info().Msg("start")
 	updates := bot.ListenForWebhook("/" + bot.Token)
-	go http.ListenAndServeTLS("0.0.0.0:"+config.V.Port, "assets/cert.pem", "assets/key.pem", nil)
+	go http.ListenAndServe("0.0.0.0:"+config.V.Port, nil)
 
 	update(updates, bot)
 }
