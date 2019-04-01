@@ -60,7 +60,8 @@ func (b *bot) WebHook() {
 
 	log.Printf("Authorized on account %s", bot.Self.UserName)
 
-	_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://"+config.V.HerokuSlug+".herokuapp.com/"+bot.Token, "assets/cert.pem"))
+	//_, err = bot.SetWebhook(tgbotapi.NewWebhookWithCert("https://"+config.V.HerokuSlug+".herokuapp.com/"+bot.Token, "assets/cert.pem"))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook("https://" + config.V.HerokuSlug + ".herokuapp.com/" + bot.Token))
 	if err != nil {
 		log.Fatal().Err(err).Msg("set hook")
 	}
